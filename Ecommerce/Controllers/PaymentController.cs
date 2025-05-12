@@ -8,4 +8,6 @@ namespace Ecom.Controllers
     public class PaymentController : ControllerBase
     {
     }
+    [HttpPost]
+    public 
 }
