@@ -12,9 +12,7 @@ namespace Ecommerce.Models
         public string Description { get; set; }
         public decimal Price { get; set; }
         public int stock { get; set; } 
-        
         public int CategoryId { get; set; }
-        [ForeignKey("CategoryId")]
         [JsonIgnore]
         public Category Category { get; set; }
 

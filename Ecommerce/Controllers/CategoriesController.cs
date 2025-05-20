@@ -1,109 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ecommerce.Data;
 using Ecommerce.Models;
 using Ecommerce.Dto;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Ecommerce.Services.Interface;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly EcomDbContext _context;
+        private readonly ICategoriesService _categoriesService;
 
-        public CategoriesController(EcomDbContext context)
+        public CategoriesController(ICategoriesService categoriesService)
         {
-            _context = context;
+            _categoriesService = categoriesService;
         }
-        //[Authorize(Roles = "Customer")]
+   
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-     
-            return await _context.Categories.ToListAsync();
-        }
+            var categories = await _categoriesService.GetCategoriesAsync();
 
+            return Ok(categories);
+        }
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return category;
+            var category = await _categoriesService.GetCategoriesByIdAsync(id);
+            return Ok(category);
         }
 
-        
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(int id, Category category)
+        public async Task<IActionResult> PutCategory(int id, Categorydto category)
         {
-            if (id != category.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(category).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var result = await _categoriesService.UpdateCategoriesAsync(id, category);
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Categorydto dto)
         {
-            var category = new Category
-            {
-                Name = dto.Name,
-                Description = dto.Description
-            };
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-            return Ok( new { Message = "Category Added" });
+            var result = await _categoriesService.AddCategoriesByIdAsync(dto);
+            return result != null ? Ok( new { Message = "Category Added" }) : BadRequest("Failed to Category");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
-
-        private bool CategoryExists(int id)
-        {
-            return _context.Categories.Any(e => e.Id == id);
+             var result = await _categoriesService.DeleteCategoriesAsync(id);
+            return result!=null ? NoContent() : NotFound();
         }
     }
 }

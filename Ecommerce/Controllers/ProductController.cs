@@ -6,78 +6,48 @@ using Ecommerce.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
+using Ecommerce.Services.Interface;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly EcomDbContext context;
-        public ProductController(EcomDbContext _context)
+        private readonly IProductService _productService;
+        public ProductController(IProductService productService)
         {
-            context = _context;
+            _productService = productService;
         }
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> Getallproduct()
         {
-            return await context.Products.ToListAsync();
-
+            var product = await _productService.GetProductAsync();
+            return Ok(product);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<Product>>> Getproductbyid(int id)
         {
-            return await context.Products.Where(p => p.CategoryId == id).ToListAsync(); 
+            var productByCategoryId = await _productService.GetProductsByCategoryIdAsync(id);   
+            return Ok(productByCategoryId); 
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> Updateproduct(int id, Product products)
+        public async Task<ActionResult<Product>> Updateproduct(int id, Productdto product)
         {
-             if(id != products.Id)
-            {
-                return BadRequest();
-            }
-             context.Entry(products).State = EntityState.Modified;
-            try
-            {
-                await context.Products.AddAsync(products);
-            }
-            catch(DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-            return NoContent();
+            var result = _productService.UpdateProductAsync(id,product);
+            return result!=null ? Ok(new {Message="Updated Successfully"}) : BadRequest("Failed to Delete");  
         }
         [HttpPost]
         public async Task<ActionResult<Product>> Addproduct(Productdto dto)
         {
-            var category = await context.Categories.FindAsync(dto.CategoryId);
-            if(category == null)
-            {
-                return BadRequest("Invalid Category Id");
-            }
-            var product = new Product
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                stock = dto.stock,
-                CategoryId = dto.CategoryId,
-            };
-             context.Products.Add(product);
-             await context.SaveChangesAsync();
-            return Ok(product);
-            
+            var result = await _productService.AddProductAsync(dto);
+            return result != null ? Ok(new { Message = "Category Added" }) : BadRequest("Failed to Category");
+
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deleteproduct(int id)
         {
-            var products = await context.Products.FindAsync(id);
-            if(products == null)
-            {
-                return NotFound();
-            }
-            context.Products.Remove(products);
-            await context.SaveChangesAsync();
-            return NoContent();
+            var result = _productService.DeleteProductAsync(id);
+            return result != null ? Ok(new {Message = "Deleted Successfully"}):BadRequest("Failed to Category");
         }
 
     }

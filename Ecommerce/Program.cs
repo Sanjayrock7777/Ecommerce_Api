@@ -7,12 +7,15 @@ using Microsoft.OpenApi.Models;
 using Ecommerce.Data;
 using Ecommerce.Models;
 using Ecommerce.Repos;
+using Ecommerce.Repositories.Interface;
+using Ecommerce.Repositories.Repository;
+using Ecommerce.Services.Interface;
+using Ecommerce.Services.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure database connection
 builder.Services.AddDbContext<EcomDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Ecomconnectionstring")));
-
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<EcomDbContext>()
@@ -21,8 +24,17 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
-
 builder.Services.AddScoped<JwttokenService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 // Configure Authentication using JWT
 builder.Services.AddAuthentication(options =>
 {
@@ -43,7 +55,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
 // Add controllers
 builder.Services.AddControllers();
 
@@ -92,7 +103,6 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
-// Build and run the app
 var app = builder.Build();
 app.UseCors("AllowFrontend");
 if (app.Environment.IsDevelopment())
