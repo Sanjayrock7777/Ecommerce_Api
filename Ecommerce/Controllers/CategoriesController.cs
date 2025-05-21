@@ -40,10 +40,10 @@ namespace Ecommerce.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Categorydto dto)
+        public async Task<ActionResult> PostCategory(Categorydto dto)
         {
             var result = await _categoriesService.AddCategoriesByIdAsync(dto);
-            return result != null ? Ok( new { Message = "Category Added" }) : BadRequest("Failed to Category");
+            return result != null ? Ok( new { Message = "Category Added"}) : BadRequest("Failed to Category");
         }
 
         [HttpDelete("{id}")]

@@ -3,7 +3,6 @@ using Ecommerce.Dto;
 using Ecommerce.Models;
 using Ecommerce.Repositories.Interface;
 using Microsoft.EntityFrameworkCore;
-
 namespace Ecommerce.Repositories.Repository
 {
     public class CategoriesRepository: ICategoriesRepository
@@ -32,7 +31,6 @@ namespace Ecommerce.Repositories.Repository
             var category = await _context.Categories.FindAsync(id); 
             if (category == null) return false;
 
-            
             category.Name = dto.Name;
             category.Description = dto.Description;
 

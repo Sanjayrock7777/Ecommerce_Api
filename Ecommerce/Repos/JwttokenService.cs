@@ -1,7 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Ecommerce.Models;
 namespace Ecommerce.Repos
@@ -32,7 +31,7 @@ namespace Ecommerce.Repos
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)   
             };
             var token = tokenHandler.CreateToken(tokendescription);
-            return tokenHandler.WriteToken(token);
+            return tokenHandler.WriteToken(token); //convert Jwt to string
         }
     }
 }

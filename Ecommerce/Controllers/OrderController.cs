@@ -1,10 +1,5 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ecommerce.Data;
-using Ecommerce.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Dto;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Ecommerce.Services.Interface;
@@ -15,12 +10,10 @@ namespace Ecommerce.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public OrderController(IOrderService orderService, UserManager<ApplicationUser> userManager)
+        public OrderController(IOrderService orderService)
         {
             _orderService = orderService;
-            _userManager = userManager;
         }
 
         [Authorize]

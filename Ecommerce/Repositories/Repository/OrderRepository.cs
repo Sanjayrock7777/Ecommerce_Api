@@ -3,7 +3,6 @@ using Ecommerce.Models;
 using Ecommerce.Repositories.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
 namespace Ecommerce.Repositories.Repository
 {
     public class OrderRepository:IOrderRepository
@@ -26,8 +25,7 @@ namespace Ecommerce.Repositories.Repository
         public async Task<List<Order>> GetUserOrdersAsync(string userId)
         {
             return await _context.Orders.Where(o => o.UserId == userId).Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
-                .OrderByDescending(o => o.OrderDate)
-                .ToListAsync();
+                .OrderByDescending(o => o.OrderDate).ToListAsync();
         }
 
         public async Task<Cart> GetCartByUserIdAsync(string userId) =>
@@ -35,7 +33,6 @@ namespace Ecommerce.Repositories.Repository
 
         public async Task<ApplicationUser> GetUserByIdAsync(string userId) =>
             await _userManager.FindByIdAsync(userId);
-
 
         public async Task<List<CartItem>> GetCartItemsAsync(int cartId) =>
             await _context.CartItems.Where(c => c.CartId == cartId).ToListAsync();
@@ -48,7 +45,6 @@ namespace Ecommerce.Repositories.Repository
             _context.CartItems.RemoveRange(cartItems);
             await SaveChangesAsync();
         }
-
         public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
     }
 }

@@ -16,17 +16,34 @@ namespace Ecommerce.Services.Service
         {
             return _repository.GetProductsAsync();
         }
-        public Task<bool> AddProductAsync(Productdto dto)
+        public async Task<Product> GetProductByIdAsync(int id)
         {
+            return await _repository.GetProductByIdAsync(id);
+        }
+        public async Task<bool> AddProductAsync(Productdto dto)
+        {
+            string imagepath=null;
+            if(dto.ImageFile != null)
+            {
+                var fileName = Guid.NewGuid() + Path.GetExtension(dto.ImageFile.FileName);
+                var path = Path.Combine("wwwroot/images", fileName);
+                using(var stream = new FileStream(path, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(stream);
+                }
+                imagepath = "/images" + fileName;
+            }
             var product = new Product
             {
                 Name = dto.Name,
                 Description = dto.Description,
                 Price = dto.Price,
                 stock = dto.stock,
-                CategoryId = dto.CategoryId
+                Brand = dto.Brand,
+                CategoryId = dto.CategoryId,
+                ImageUrl = imagepath
             };
-            return _repository.AddProductAsync(product);
+            return await _repository.AddProductAsync(product);
         }
         public async Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int id)
         {

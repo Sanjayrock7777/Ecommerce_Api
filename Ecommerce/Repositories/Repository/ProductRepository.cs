@@ -17,6 +17,10 @@ namespace Ecommerce.Repositories.Repository
         {
             return await _context.Products.ToListAsync();
         }
+        public async Task<Product> GetProductByIdAsync(int id)
+        {
+            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+        }
         public async Task<IEnumerable<Product>> GetProductByCategoryId(int id)
         {
             return await _context.Products.Where(p =>  p.CategoryId == id).ToListAsync();
@@ -35,7 +39,7 @@ namespace Ecommerce.Repositories.Repository
             product.Price = dto.Price;
             product.stock = dto.stock;
             product.CategoryId = dto.CategoryId;
-
+           //product.ImageUrl = dto.ImageFile;
            // _context.Entry(product).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }

@@ -1,11 +1,7 @@
 ﻿using Ecommerce.Data;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Models;
 using Ecommerce.Dto;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Services.Interface;
 namespace Ecommerce.Controllers
 {
@@ -24,8 +20,16 @@ namespace Ecommerce.Controllers
             var product = await _productService.GetProductAsync();
             return Ok(product);
         }
+        [HttpGet("productdetails/{id}")]
+        public async Task<ActionResult<Product>> GetProductById(int id)
+        {
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) return NotFound(new { Message = "Product not found" });
+
+            return Ok(product);
+        }
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Product>>> Getproductbyid(int id)
+        public async Task<ActionResult<IEnumerable<Product>>> GetproductbyCategoryid(int id)
         {
             var productByCategoryId = await _productService.GetProductsByCategoryIdAsync(id);   
             return Ok(productByCategoryId); 
@@ -49,6 +53,6 @@ namespace Ecommerce.Controllers
             var result = _productService.DeleteProductAsync(id);
             return result != null ? Ok(new {Message = "Deleted Successfully"}):BadRequest("Failed to Category");
         }
-
+        
     }
 }

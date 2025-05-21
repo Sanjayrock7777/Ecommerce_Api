@@ -23,10 +23,22 @@ namespace Ecommerce.Services.Service
         }
         public async Task<bool> AddCategoriesByIdAsync(Categorydto model)
         {
+            string imagepath = null;
+            if (model.ImageFile != null)
+            {
+                var fileName = Guid.NewGuid() + Path.GetExtension(model.ImageFile.FileName);
+                var path = Path.Combine("wwwroot/images", fileName);
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await model.ImageFile.CopyToAsync(stream);
+                }
+                imagepath = "/images" + fileName;
+            }
             var category = new Category
             {
                 Name = model.Name,
-                Description = model.Description
+                Description = model.Description,
+                ImageUrl = imagepath
             };
            return await _categoryRepository.AddCategoryAsync(category);
 

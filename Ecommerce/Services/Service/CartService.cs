@@ -62,10 +62,13 @@ namespace Ecommerce.Services.Service
         {
             var cartItem = await _cartRepository.GetCartItemByIdAsync(cartItemId);
             if (cartItem == null) return false;
-
-            cartItem.Quantity = quantity;
-            await _cartRepository.SaveChangesAsync();
-            return true;
+            if(cartItem.Quantity >= quantity)
+            {
+                cartItem.Quantity = quantity;
+                await _cartRepository.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> DeleteCartItemAsync(int cartItemId)
