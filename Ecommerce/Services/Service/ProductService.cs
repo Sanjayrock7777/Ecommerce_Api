@@ -31,7 +31,7 @@ namespace Ecommerce.Services.Service
                 {
                     await dto.ImageFile.CopyToAsync(stream);
                 }
-                imagepath = "/images" + fileName;
+                imagepath = "/images/" + fileName;
             }
             var product = new Product
             {
