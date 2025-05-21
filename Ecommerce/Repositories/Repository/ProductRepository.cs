@@ -19,7 +19,7 @@ namespace Ecommerce.Repositories.Repository
         }
         public async Task<Product> GetProductByIdAsync(int id)
         {
-            return await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Products.FindAsync(id);
         }
         public async Task<IEnumerable<Product>> GetProductByCategoryId(int id)
         {
@@ -38,15 +38,27 @@ namespace Ecommerce.Repositories.Repository
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.stock = dto.stock;
+            product.Brand = dto.Brand;
             product.CategoryId = dto.CategoryId;
-           //product.ImageUrl = dto.ImageFile;
-           // _context.Entry(product).State = EntityState.Modified;
+            if (dto.ImageFile!= null)
+            {
+                var filePath = Path.Combine("wwwroot/images", dto.ImageFile.FileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(stream); 
+                }
+
+                product.ImageUrl = "/images/" + dto.ImageFile.FileName; 
+            }
+            _context.Entry(product).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }
 
         public async Task<bool> DeleteProductAsync(int id)
         {
             var product = await _context.Products.FindAsync(id);
+            if (product == null) return false;
             _context.Products.Remove(product);  
             return await _context.SaveChangesAsync() > 0;
         }

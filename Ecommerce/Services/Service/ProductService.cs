@@ -54,9 +54,9 @@ namespace Ecommerce.Services.Service
 
             return _repository.UpdateProductAsync(product,id);
         }
-        public Task<bool> DeleteProductAsync(int id)
+        public async Task<bool> DeleteProductAsync(int id)
         {
-            return _repository.DeleteProductAsync(id);
+            return await _repository.DeleteProductAsync(id);
         }
 
 

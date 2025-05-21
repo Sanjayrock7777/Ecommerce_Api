@@ -14,13 +14,13 @@ namespace Ecommerce.Controllers
         {
             _productService = productService;
         }
-        [HttpGet]
+        [HttpGet("GetAllProducts")]
         public async Task<ActionResult<IEnumerable<Product>>> Getallproduct()
         {
             var product = await _productService.GetProductAsync();
             return Ok(product);
         }
-        [HttpGet("productdetails/{id}")]
+        [HttpGet("GetProductByProductId/{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
@@ -28,7 +28,7 @@ namespace Ecommerce.Controllers
 
             return Ok(product);
         }
-        [HttpGet("{id}")]
+        [HttpGet("GetProductByCategoryId/{id}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetproductbyCategoryid(int id)
         {
             var productByCategoryId = await _productService.GetProductsByCategoryIdAsync(id);   
@@ -37,7 +37,7 @@ namespace Ecommerce.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Product>> Updateproduct(int id, Productdto product)
         {
-            var result = _productService.UpdateProductAsync(id,product);
+            var result = await _productService.UpdateProductAsync(id,product);
             return result!=null ? Ok(new {Message="Updated Successfully"}) : BadRequest("Failed to Delete");  
         }
         [HttpPost]
@@ -50,7 +50,7 @@ namespace Ecommerce.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deleteproduct(int id)
         {
-            var result = _productService.DeleteProductAsync(id);
+            var result = await _productService.DeleteProductAsync(id);
             return result != null ? Ok(new {Message = "Deleted Successfully"}):BadRequest("Failed to Category");
         }
         
