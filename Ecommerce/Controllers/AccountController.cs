@@ -23,7 +23,7 @@ namespace Ecom.Controllers
             {
                 return BadRequest("Invalid data");
             }
-            var success = await _userService.RegisterUserAsync(model, "Customer");
+            var success = await _userService.RegisterUserAsync(model, "Customer", model.Password);
             return success ? Ok("Customer registered successfully") : BadRequest("Registration failed");
         }
         [Authorize]

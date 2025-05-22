@@ -20,9 +20,9 @@ namespace Ecommerce.Repositories.Repository
         {
             return await _userManager.FindByEmailAsync(email);
         }
-        public async Task<bool> AddUserAsync(ApplicationUser user, string role)
+        public async Task<bool> AddUserAsync(ApplicationUser user, string role, string password)
         {
-            var result = await _userManager.CreateAsync(user); 
+            var result = await _userManager.CreateAsync(user, password); 
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, role);

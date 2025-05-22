@@ -32,7 +32,7 @@ namespace Ecommerce.Services.Service
                 {
                     await model.ImageFile.CopyToAsync(stream);
                 }
-                imagepath = "/images" + fileName;
+                imagepath = "/images/" + fileName;
             }
             var category = new Category
             {

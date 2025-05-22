@@ -33,7 +33,17 @@ namespace Ecommerce.Repositories.Repository
 
             category.Name = dto.Name;
             category.Description = dto.Description;
+            if (dto.ImageFile != null)
+            {
+                var filePath = Path.Combine("wwwroot/images", dto.ImageFile.FileName);
 
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await dto.ImageFile.CopyToAsync(stream);
+                }
+
+                category.ImageUrl = "/images/" + dto.ImageFile.FileName;
+            }
             _context.Entry(category).State = EntityState.Modified;
             return await _context.SaveChangesAsync() > 0;
         }

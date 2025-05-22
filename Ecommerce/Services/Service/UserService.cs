@@ -21,7 +21,7 @@ namespace Ecommerce.Services.Service
             _jwtTokenService = jwttokenService;
             _signInManager = signInManager;
         }
-        public async Task<bool> RegisterUserAsync(RegisterCustomerdto model, string role)
+        public async Task<bool> RegisterUserAsync(RegisterCustomerdto model, string role, string password)
         {
             var user = new ApplicationUser
             {
@@ -34,7 +34,7 @@ namespace Ecommerce.Services.Service
                 PhoneNumber = model.PhoneNumber,
                 CreatedDate = DateTime.UtcNow
             };
-            var success = await _userRepository.AddUserAsync(user, role);
+            var success = await _userRepository.AddUserAsync(user, role, password);
             if(!success)
             {
                 return false;
