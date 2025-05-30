@@ -58,6 +58,10 @@ namespace Ecommerce.Services.Service
         {
             return await _repository.DeleteProductAsync(id);
         }
+        public async Task<List<Product>> SearchProductsAsync(string query)
+        {
+            return await _repository.SearchProductsAsync(query);
+        }
 
 
     }

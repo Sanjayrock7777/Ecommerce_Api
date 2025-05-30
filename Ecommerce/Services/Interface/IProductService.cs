@@ -11,5 +11,6 @@ namespace Ecommerce.Services.Interface
         Task<bool> AddProductAsync(Productdto product);
         Task<bool> UpdateProductAsync(int id,Productdto product);
         Task<bool> DeleteProductAsync(int id);
+        Task<List<Product>> SearchProductsAsync(string query);
     }
 }

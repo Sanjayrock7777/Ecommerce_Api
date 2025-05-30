@@ -20,6 +20,7 @@ namespace Ecommerce.Repositories.Repository
         {
             return await _context.Categories.FindAsync(id);
         }
+
         public async Task<bool> AddCategoryAsync(Category category)
         {
             _context.Categories.Add(category);

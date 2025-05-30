@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Services.Interface;
+using System.Linq.Expressions;
 
 namespace Ecom.Controllers
 {
@@ -17,18 +18,42 @@ namespace Ecom.Controllers
         }
 
         [HttpPost("register/customer")]
-        public async Task<IActionResult> RegisterCustomer(RegisterCustomerdto model)
+        public async Task<IActionResult> RegisterCustomer(Registerdto model)
         {
-            if(model == null)
+            try
             {
-                return BadRequest("Invalid data");
+                if (model == null)
+                {
+                    return BadRequest("Invalid data");
+                }
+                var success = await _userService.RegisterUserAsync(model, "Customer", model.Password);
+                return success ? Ok(new { message = "Customer registered successfully" }) : BadRequest("Registration failed");
             }
-            var success = await _userService.RegisterUserAsync(model, "Customer", model.Password);
-            return success ? Ok("Customer registered successfully") : BadRequest("Registration failed");
+            catch (Exception ex)
+            {
+                return StatusCode(500,new {success = false,Message=ex.Message});    
+            }
+        }
+        [HttpPost("register/Admin")]
+        public async Task<IActionResult> RegisterAdmin(Registerdto model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return BadRequest("Invalid admin data");
+                }
+                var success = await _userService.RegisterUserAsync(model, "Admin", model.Password);
+                return success ? Ok(new { message = "Admin Registered Successfully" }) : BadRequest("Registration Failed");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, Message = ex.Message });
+            }
         }
         [Authorize]
         [HttpPut("update/customer")]
-        public async Task<IActionResult> UpdateCustomer(RegisterCustomerdto update)
+        public async Task<IActionResult> UpdateCustomer(Registerdto update)
         {
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var success = await _userService.UpdateCustomerAsync(userid, update);
@@ -40,7 +65,7 @@ namespace Ecom.Controllers
             var (success, role, userId, token) = await _userService.LoginAsync(model);
             return success ? Ok(new { success, role, userId, token }) : Unauthorized("Invalid credentials");
         }
-        [Authorize] 
+        [Authorize(Roles ="Customer")] 
         [HttpGet("address")]
         public async Task<IActionResult> GetAddressByUserId()
         {

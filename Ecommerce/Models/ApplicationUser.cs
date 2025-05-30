@@ -8,6 +8,6 @@ namespace Ecommerce.Models
         public string Pincode { get; set; }
         public DateTime CreatedDate { get; set; } 
         public Customer Customer { get; set; }
-        public Employee Employee { get; set; }
+        public Admin Admin { get; set; }
     }
 }

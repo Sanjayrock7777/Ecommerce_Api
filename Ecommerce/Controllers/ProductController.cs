@@ -53,6 +53,22 @@ namespace Ecommerce.Controllers
             var result = await _productService.DeleteProductAsync(id);
             return result != null ? Ok(new {Message = "Deleted Successfully"}):BadRequest("Failed to Category");
         }
-        
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return BadRequest("Query cannot be empty");
+
+            var products = await _productService.SearchProductsAsync(query);
+            if (products.Count != 0)
+            {
+                return Ok(products);
+            }
+            else
+            {
+                return Ok(new { productfoundstatus = false });
+            }
+        }
+
     }
 }

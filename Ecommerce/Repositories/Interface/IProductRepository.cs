@@ -11,5 +11,6 @@ namespace Ecommerce.Repositories.Interface
         Task<bool> AddProductAsync(Product product); 
         Task<bool> UpdateProductAsync(Productdto product, int id);
         Task<bool> DeleteProductAsync(int id);
+        Task<List<Product>> SearchProductsAsync(string query);
     }
 }

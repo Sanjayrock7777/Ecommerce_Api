@@ -10,31 +10,41 @@ using Ecommerce.Repositories.Interface;
 using Ecommerce.Repositories.Repository;
 using Ecommerce.Services.Interface;
 using Ecommerce.Services.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure database connection
 builder.Services.AddDbContext<EcomDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Ecomconnectionstring")));
+
 // Configure Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<EcomDbContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
+
 builder.Services.AddScoped<JwttokenService>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
 builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
+
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IOrderService, OrderService>();
-// Configure Authentication using JWT
+
+// Configure authentication using JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";
@@ -65,10 +75,9 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Ecommerce API",
         Version = "v1",
-        Description = "An API for managing Ecommerce system with Customer, Employee, and Admin roles."
+        Description = "Ecommerce system with Customer and Admin roles"
     });
 
-    // Configure JWT Authentication in Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,

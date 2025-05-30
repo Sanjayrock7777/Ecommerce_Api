@@ -14,7 +14,6 @@ namespace Ecommerce.Repositories.Repository
             _context = context;
             _userManager = userManager;
         }
-
         public async Task<Order> CreateOrderAsync(Order order)
         {
             _context.Orders.Add(order);

@@ -62,12 +62,10 @@ namespace Ecommerce.Services.Service
         {
             var cartItem = await _cartRepository.GetCartItemByIdAsync(cartItemId);
             if (cartItem == null) return false;
-            if(cartItem.Quantity >= quantity)
-            {
-                cartItem.Quantity = quantity;
-                await _cartRepository.SaveChangesAsync();
-                return true;
-            }
+            cartItem.Quantity = quantity;
+            await _cartRepository.SaveChangesAsync();
+            return true;
+            
             return false;
         }
 

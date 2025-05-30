@@ -62,6 +62,10 @@ namespace Ecommerce.Repositories.Repository
             _context.Products.Remove(product);  
             return await _context.SaveChangesAsync() > 0;
         }
+        public async Task<List<Product>> SearchProductsAsync(string query)
+        {
+            return await _context.Products.Where(p => p.Name.Contains(query) || p.Brand.Contains(query)).Take(5).ToListAsync();
+        }
 
     }
 }

@@ -21,7 +21,7 @@ namespace Ecommerce.Services.Service
             _jwtTokenService = jwttokenService;
             _signInManager = signInManager;
         }
-        public async Task<bool> RegisterUserAsync(RegisterCustomerdto model, string role, string password)
+        public async Task<bool> RegisterUserAsync(Registerdto model, string role, string password)
         {
             var user = new ApplicationUser
             {
@@ -43,17 +43,28 @@ namespace Ecommerce.Services.Service
             {
                 return false;
             }
-            var customer = new Customer
+            if (role == "Customer")
             {
-                UserId = user.Id,
-                User = user
-            };
-            _context.Customers.Add(customer);
-            var cart = new Cart
+                var customer = new Customer
+                {
+                    UserId = user.Id,
+                    User = user
+                };
+                _context.Customers.Add(customer);
+            }
+            else if(role == "Admin")
             {
-                UserId = user.Id,
-                User = user
-            };
+                var admin = new Admin
+                {
+                    UserId= user.Id,    
+                    User = user
+                };
+            }
+                var cart = new Cart
+                {
+                    UserId = user.Id,
+                    User = user
+                };
             _context.Carts.Add(cart);   
             return await _context.SaveChangesAsync() > 0;
 
@@ -75,7 +86,7 @@ namespace Ecommerce.Services.Service
             var token = _jwtTokenService.GenerateToken(user, role);
             return (true, role, user.Id, token);    
         }
-        public async Task<bool> UpdateCustomerAsync(string userId, RegisterCustomerdto update)
+        public async Task<bool> UpdateCustomerAsync(string userId, Registerdto update)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
