@@ -45,12 +45,14 @@ namespace Ecommerce.Services.Service
             }
             if (role == "Customer")
             {
+
                 var customer = new Customer
                 {
                     UserId = user.Id,
                     User = user
                 };
-                _context.Customers.Add(customer);
+                return await _userRepository.AddCustomerAsync(customer);
+                
             }
             else if(role == "Admin")
             {
@@ -59,14 +61,9 @@ namespace Ecommerce.Services.Service
                     UserId= user.Id,    
                     User = user
                 };
+                return await _userRepository.AddAdminAsync(admin);
             }
-                var cart = new Cart
-                {
-                    UserId = user.Id,
-                    User = user
-                };
-            _context.Carts.Add(cart);   
-            return await _context.SaveChangesAsync() > 0;
+            return false;
 
         }
         public async Task<(bool success, string role, string userId, string token)> LoginAsync(Logindto model)

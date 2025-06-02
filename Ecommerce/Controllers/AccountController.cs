@@ -34,6 +34,7 @@ namespace Ecom.Controllers
                 return StatusCode(500,new {success = false,Message=ex.Message});    
             }
         }
+        [Authorize(Roles ="Admin")]
         [HttpPost("register/Admin")]
         public async Task<IActionResult> RegisterAdmin(Registerdto model)
         {
@@ -51,7 +52,7 @@ namespace Ecom.Controllers
                 return StatusCode(500, new { success = false, Message = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Customer")]
         [HttpPut("update/customer")]
         public async Task<IActionResult> UpdateCustomer(Registerdto update)
         {

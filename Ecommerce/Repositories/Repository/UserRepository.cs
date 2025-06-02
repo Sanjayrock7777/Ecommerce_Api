@@ -1,4 +1,5 @@
-﻿using Ecommerce.Models;
+﻿using Ecommerce.Data;
+using Ecommerce.Models;
 using Ecommerce.Repositories.Interface;
 using Microsoft.AspNetCore.Identity;
 
@@ -8,9 +9,11 @@ namespace Ecommerce.Repositories.Repository
     {
         
         private readonly UserManager<ApplicationUser> _userManager;
-        public UserRepository(UserManager<ApplicationUser> userManager)
+        private readonly EcomDbContext _context;    
+        public UserRepository(UserManager<ApplicationUser> userManager, EcomDbContext context)
         {
            _userManager = userManager; 
+            _context = context; 
         }
         public async Task<ApplicationUser> GetUserByIdAsync(string userId)
         {
@@ -29,6 +32,16 @@ namespace Ecommerce.Repositories.Repository
                 return true;
             }
             return false;
+        }
+        public async Task<bool> AddCustomerAsync(Customer customer)
+        {
+            _context.Customers.Add(customer);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<bool> AddAdminAsync(Admin admin)
+        {
+            _context.Admin.Add(admin);
+            return await _context.SaveChangesAsync() > 0;
         }
         public async Task<IList<string>> GetUserRolesAsync(ApplicationUser user)
         {

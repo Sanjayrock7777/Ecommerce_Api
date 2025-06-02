@@ -6,6 +6,9 @@ namespace Ecommerce.Repositories.Interface
     {
         Task<Order> CreateOrderAsync(Order order);
         Task<List<Order>> GetUserOrdersAsync(string userId);
+        Task<Order> GetOrdersByIDAsync(int orderid);
+        Task<IEnumerable<Order>> GetAllOrdersAsync();
+        Task<bool> UpdateOrderStatusAsync(Order order);
         Task<Cart> GetCartByUserIdAsync(string userId);
         Task<ApplicationUser> GetUserByIdAsync(string userId);
         Task<List<CartItem>> GetCartItemsAsync(int cartId);

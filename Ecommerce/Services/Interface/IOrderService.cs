@@ -7,5 +7,7 @@ namespace Ecommerce.Services.Interface
     {
         Task<Order> CreateOrderAsync(string userId, Orderdto dto);
         Task<object> GetUserOrdersAsync(string userId);
+        Task<bool> UpdateOrderStatusAsync(int orderId, string status);
+        Task<IEnumerable<Order>> GetAllOrdersAsync();   
     }
 }

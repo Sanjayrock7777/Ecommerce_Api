@@ -26,6 +26,19 @@ namespace Ecommerce.Repositories.Repository
             return await _context.Orders.Where(o => o.UserId == userId).Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
                 .OrderByDescending(o => o.OrderDate).ToListAsync();
         }
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        {
+            return await _context.Orders.ToListAsync();
+        }
+        public async Task<bool> UpdateOrderStatusAsync(Order order)
+        {
+            _context.Orders.Update(order);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<Order> GetOrdersByIDAsync(int orderid)
+        {
+            return await _context.Orders.FindAsync(orderid);
+        }
 
         public async Task<Cart> GetCartByUserIdAsync(string userId) =>
             await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);

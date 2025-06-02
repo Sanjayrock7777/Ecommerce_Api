@@ -5,6 +5,7 @@ using Ecommerce.Data;
 using Ecommerce.Models;
 using Ecommerce.Dto;
 using Ecommerce.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
@@ -32,6 +33,7 @@ namespace Ecommerce.Controllers
             return Ok(category);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(int id, Categorydto category)
         {
@@ -39,6 +41,7 @@ namespace Ecommerce.Controllers
             return result != null ? Ok(result) : NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> PostCategory(Categorydto dto)
         {
@@ -46,6 +49,7 @@ namespace Ecommerce.Controllers
             return result != null ? Ok( new { Message = "Category Added"}) : BadRequest("Failed to Category");
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {

@@ -8,7 +8,5 @@ namespace Ecommerce.Services.Interface
         Task<(bool success, string role, string userId, string token)> LoginAsync(Logindto model);
         Task<bool> UpdateCustomerAsync(string userId, Registerdto update);
         Task<ApplicationUser> GetCustomerAddressAsync(string userId);
-
-
     }
 }

@@ -3,6 +3,7 @@ using Ecommerce.Dto;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Ecommerce.Services.Interface;
+using Ecommerce.Models;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
@@ -16,7 +17,7 @@ namespace Ecommerce.Controllers
             _orderService = orderService;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Customer")]
         [HttpPost("createorder")]
         public async Task<IActionResult> CreateOrder([FromBody] Orderdto dto)
         {
@@ -36,6 +37,7 @@ namespace Ecommerce.Controllers
             }
         }
 
+        [Authorize(Roles = "Customer")]
         [HttpGet("userorders")]
         public async Task<IActionResult> GetUserOrders()
         {
@@ -45,5 +47,22 @@ namespace Ecommerce.Controllers
             return orders != null? Ok(new { success = true, orders }): NotFound(new { success = false, message = "No orders found for the user." });
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("UpdateOrderStatus/{id}")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, string orderStatus)
+        {
+            var orderstatusupdate = await _orderService.UpdateOrderStatusAsync(id, orderStatus);
+            return orderstatusupdate != null ? Ok(new { success = true, Message = "Order Status Updated Successfully" }) : NotFound(new { success = false });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+        {
+            var order = await _orderService.GetAllOrdersAsync();
+            if (order == null) 
+                return NotFound(new { Message = "Orders not found" });
+            return Ok(order);   
+        }
     }
 }

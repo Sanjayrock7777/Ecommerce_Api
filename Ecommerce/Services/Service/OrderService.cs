@@ -79,5 +79,17 @@ namespace Ecommerce.Services.Service
                 }).ToList()
             }).ToList();
         }
+
+        public async Task<bool> UpdateOrderStatusAsync(int orderid, string status)
+        {
+            var order = await _orderRepository.GetOrdersByIDAsync(orderid);
+            order.Status = status;
+            var orderUpdate = await _orderRepository.UpdateOrderStatusAsync(order);
+            return orderUpdate != null ? true : false;
+        }
+        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        {
+            return await _orderRepository.GetAllOrdersAsync();
+        }
     }
 }

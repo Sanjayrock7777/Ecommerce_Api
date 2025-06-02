@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Models;
 using Ecommerce.Dto;
 using Ecommerce.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
@@ -24,7 +25,8 @@ namespace Ecommerce.Controllers
         public async Task<ActionResult<Product>> GetProductById(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);
-            if (product == null) return NotFound(new { Message = "Product not found" });
+            if (product == null) 
+                return NotFound(new { Message = "Product not found" });
 
             return Ok(product);
         }
@@ -34,12 +36,16 @@ namespace Ecommerce.Controllers
             var productByCategoryId = await _productService.GetProductsByCategoryIdAsync(id);   
             return Ok(productByCategoryId); 
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<Product>> Updateproduct(int id, Productdto product)
         {
             var result = await _productService.UpdateProductAsync(id,product);
             return result!=null ? Ok(new {Message="Updated Successfully"}) : BadRequest("Failed to Delete");  
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> Addproduct(Productdto dto)
         {
@@ -47,6 +53,8 @@ namespace Ecommerce.Controllers
             return result != null ? Ok(new { Message = "Category Added" }) : BadRequest("Failed to Category");
 
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deleteproduct(int id)
         {
