@@ -15,7 +15,7 @@ namespace Ecommerce.Repositories.Repository
         }
         public async Task<IEnumerable<Product>> GetProductsAsync()
         {
-            return await _context.Products.ToListAsync();
+            return await _context.Products.Where(p => p.stock >0 && p.Price>0).ToListAsync();
         }
         public async Task<Product> GetProductByIdAsync(int id)
         {
@@ -23,7 +23,7 @@ namespace Ecommerce.Repositories.Repository
         }
         public async Task<IEnumerable<Product>> GetProductByCategoryId(int id)
         {
-            return await _context.Products.Where(p =>  p.CategoryId == id).ToListAsync();
+            return await _context.Products.Where(p =>  p.CategoryId == id && p.stock > 0 && p.Price > 0).ToListAsync();
         }
         public async Task<bool> AddProductAsync(Product product)
         {

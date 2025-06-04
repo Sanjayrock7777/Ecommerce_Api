@@ -29,6 +29,7 @@ namespace Ecommerce.Controllers
             try
             {
                 var order = await _orderService.CreateOrderAsync(userId, dto);
+                if (order == null) return NotFound();
                 return Ok(new { success = true, message = "Order placed successfully!", orderId = order.Id });
             }
             catch (Exception ex)

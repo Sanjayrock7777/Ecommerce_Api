@@ -6,6 +6,7 @@ namespace Ecommerce.Repositories.Interface
     {
         Task<Cart> GetCartByUserIdAsync(string userId);
         Task AddCartAsync(Cart cart);
+        
         Task UpdateCartAsync(Cart cart);
         Task<CartItem> GetCartItemByIdAsync(int cartItemId);
         Task UpdateCartItemAsync(CartItem cartItem);

@@ -28,9 +28,10 @@ namespace Ecommerce.Repositories.Repository
             _context.Carts.Update(cart);
             await SaveChangesAsync();
         }
+        
 
         public async Task<CartItem> GetCartItemByIdAsync(int cartItemId) =>
-            await _context.CartItems.FindAsync(cartItemId);
+            await _context.CartItems.Include(c=>c.Product).FirstOrDefaultAsync(c => c.Id == cartItemId);
 
         public async Task UpdateCartItemAsync(CartItem cartItem)
         {

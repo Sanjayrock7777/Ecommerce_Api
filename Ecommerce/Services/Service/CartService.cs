@@ -61,11 +61,14 @@ namespace Ecommerce.Services.Service
         public async Task<bool> UpdateCartItemQuantityAsync(int cartItemId, int quantity)
         {
             var cartItem = await _cartRepository.GetCartItemByIdAsync(cartItemId);
-            if (cartItem == null) return false;
-            cartItem.Quantity = quantity;
-            await _cartRepository.SaveChangesAsync();
-            return true;
             
+            if (cartItem == null) return false;
+            if(0< quantity && quantity< cartItem.Product.stock)
+            {
+                cartItem.Quantity = quantity;
+                await _cartRepository.SaveChangesAsync();
+                return true;
+            }
             return false;
         }
 

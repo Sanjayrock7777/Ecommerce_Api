@@ -42,7 +42,7 @@ namespace Ecommerce.Controllers
             return cart != null ? Ok(cart) : NotFound("Cart not found.");
         }
         [Authorize(Roles = "Customer")]
-        [HttpPut("{cartItemId}/quantity")]
+        [HttpPut("{cartItemId}/quantity")] 
         public async Task<IActionResult> UpdateCartItemQuantity(int cartItemId, int quantity)
         {
             var success = await _cartService.UpdateCartItemQuantityAsync(cartItemId, quantity);

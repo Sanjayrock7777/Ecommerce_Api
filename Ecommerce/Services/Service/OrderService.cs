@@ -2,6 +2,7 @@
 using Ecommerce.Models;
 using Ecommerce.Repositories.Interface;
 using Ecommerce.Services.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Services.Service
 {
@@ -39,25 +40,25 @@ namespace Ecommerce.Services.Service
                 }).ToList()
             };
 
-            await _orderRepository.CreateOrderAsync(order);
 
             var productIds = dto.Orderitems.Select(o => o.ProductId).ToList();
             var products = await _orderRepository.GetProductsByIdsAsync(productIds);
-
-            foreach (var item in order.OrderItems)
-            {
-                var product = products.FirstOrDefault(p => p.Id == item.ProductId);
-                if (product != null) product.stock -= item.Quantity;
-            }
-
             var cartItems = await _orderRepository.GetCartItemsAsync(cart.Id);
             var cartItemsToRemove = cartItems.Where(c => productIds.Contains(c.ProductId)).ToList();
-
             if (cartItemsToRemove.Any()) await _orderRepository.RemoveCartItemsAsync(cartItemsToRemove);
+            if (cartItemsToRemove.Count == order.OrderItems.Count)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    var product = products.FirstOrDefault(p => p.Id == item.ProductId);
+                    if (product != null) product.stock -= item.Quantity;
+                }
+                await _orderRepository.CreateOrderAsync(order);
+                await _orderRepository.SaveChangesAsync();
+                return order;
+            }
 
-            await _orderRepository.SaveChangesAsync();
-
-            return order;
+            return null;
         }
 
         public async Task<object> GetUserOrdersAsync(string userId)
@@ -92,6 +93,7 @@ namespace Ecommerce.Services.Service
             var allorder =  await _orderRepository.GetAllOrdersAsync();
             return allorder.Select(o => new
             {
+                o.Id,
                 o.OrderDate,
                 o.PaymentMethod,
                 o.Status,
