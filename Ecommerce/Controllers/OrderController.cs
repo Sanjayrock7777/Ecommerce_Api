@@ -55,9 +55,9 @@ namespace Ecommerce.Controllers
             return orderstatusupdate != null ? Ok(new { success = true, Message = "Order Status Updated Successfully" }) : NotFound(new { success = false });
         }
 
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         [HttpGet("GetAllOrders")]
-        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+        public async Task<ActionResult<IEnumerable<IActionResult>>> GetAllOrders()
         {
             var order = await _orderService.GetAllOrdersAsync();
             if (order == null) 

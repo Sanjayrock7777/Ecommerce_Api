@@ -87,9 +87,23 @@ namespace Ecommerce.Services.Service
             var orderUpdate = await _orderRepository.UpdateOrderStatusAsync(order);
             return orderUpdate != null ? true : false;
         }
-        public async Task<IEnumerable<Order>> GetAllOrdersAsync()
+        public async Task<IEnumerable<Object>> GetAllOrdersAsync()
         {
-            return await _orderRepository.GetAllOrdersAsync();
+            var allorder =  await _orderRepository.GetAllOrdersAsync();
+            return allorder.Select(o => new
+            {
+                o.OrderDate,
+                o.PaymentMethod,
+                o.Status,
+                o.Address,
+                o.TotalPrice,
+                OrderItems = o.OrderItems.Select(oi => new
+                {
+                    ProductName = oi.Product?.Name ?? "Unknown",
+                    oi.Quantity,
+                    oi.Price
+                }).ToList()
+            }).ToList();
         }
     }
 }
