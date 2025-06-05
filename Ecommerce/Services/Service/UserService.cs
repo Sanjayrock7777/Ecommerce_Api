@@ -11,13 +11,13 @@ namespace Ecommerce.Services.Service
     public class UserService: IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly EcomDbContext _context;
+        //private readonly EcomDbContext _context;
         private readonly JwttokenService _jwtTokenService;
         private readonly SignInManager<ApplicationUser> _signInManager;
         public UserService(IUserRepository userRepository, EcomDbContext context, JwttokenService jwttokenService, SignInManager<ApplicationUser> signInManager)
         {
             _userRepository = userRepository;
-            _context = context; 
+           // _context = context; 
             _jwtTokenService = jwttokenService;
             _signInManager = signInManager;
         }

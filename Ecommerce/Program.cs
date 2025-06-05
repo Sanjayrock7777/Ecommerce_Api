@@ -29,6 +29,8 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 builder.Services.AddScoped<JwttokenService>();
 
+builder.Services.AddScoped<IEcommercedetailsRepository, EcommercedetailsRepository>();
+
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 
