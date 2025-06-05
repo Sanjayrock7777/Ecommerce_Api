@@ -91,6 +91,7 @@ namespace Ecommerce.Services.Service
                 return false;
             }
             user.Fullname = update.FullName ?? user.Fullname;
+            user.Email = update.Email ?? user.Email;
             user.Address = update.Address ?? user.Address;
             user.Pincode = update.Pincode ?? user.Pincode;
             user.PhoneNumber = update.PhoneNumber ?? user.PhoneNumber;

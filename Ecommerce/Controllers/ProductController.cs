@@ -15,12 +15,19 @@ namespace Ecommerce.Controllers
         {
             _productService = productService;
         }
-        [HttpGet("GetAllProducts")]
-        public async Task<ActionResult<IEnumerable<Product>>> Getallproduct()
+        [HttpGet("GetAllProductsforcustomer")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetallproductforCustomer()
         {
             var product = await _productService.GetProductAsync();
             return Ok(product);
         }
+        [HttpGet("GetAllProductsforAdmin")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetallproductforAdmin()
+        {
+            var product = await _productService.GetProductforAdminAsync();
+            return Ok(product);
+        }
+
         [HttpGet("GetProductByProductId/{id}")]
         public async Task<ActionResult<Product>> GetProductById(int id)
         {

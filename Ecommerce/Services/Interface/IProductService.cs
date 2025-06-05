@@ -6,6 +6,7 @@ namespace Ecommerce.Services.Interface
     public interface IProductService
     {
         Task<IEnumerable<Product>> GetProductAsync();
+        Task<IEnumerable<Product>> GetProductforAdminAsync();
         Task<Product> GetProductByIdAsync(int id);
         Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int id);
         Task<bool> AddProductAsync(Productdto product);

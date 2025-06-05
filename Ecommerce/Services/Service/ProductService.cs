@@ -16,6 +16,10 @@ namespace Ecommerce.Services.Service
         {
             return _repository.GetProductsAsync();
         }
+        public Task<IEnumerable<Product>> GetProductforAdminAsync()
+        {
+            return _repository.GetProductsforAdminAsync();
+        }
         public async Task<Product> GetProductByIdAsync(int id)
         {
             return await _repository.GetProductByIdAsync(id);

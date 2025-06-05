@@ -17,6 +17,10 @@ namespace Ecommerce.Repositories.Repository
         {
             return await _context.Products.Where(p => p.stock >0 && p.Price>0).ToListAsync();
         }
+        public async Task<IEnumerable<Product>> GetProductsforAdminAsync()
+        {
+            return await _context.Products.ToListAsync();
+        }
         public async Task<Product> GetProductByIdAsync(int id)
         {
             return await _context.Products.FindAsync(id);

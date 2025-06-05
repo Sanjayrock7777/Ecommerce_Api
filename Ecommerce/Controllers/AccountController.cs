@@ -52,13 +52,13 @@ namespace Ecom.Controllers
                 return StatusCode(500, new { success = false, Message = ex.Message });
             }
         }
-        [Authorize(Roles = "Customer")]
+        [Authorize]
         [HttpPut("update/customer")]
         public async Task<IActionResult> UpdateCustomer(Registerdto update)
         {
             var userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var success = await _userService.UpdateCustomerAsync(userid, update);
-            return Ok("Customer details updated Successfully");
+            return Ok( new {Message = "Customer details updated Successfully" });
         }
         [HttpPost("login")]
         public async Task<IActionResult> Login(Logindto model)

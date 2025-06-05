@@ -6,6 +6,7 @@ namespace Ecommerce.Repositories.Interface
     public interface IProductRepository
     {
         Task<IEnumerable<Product>> GetProductsAsync();
+        Task<IEnumerable<Product>> GetProductsforAdminAsync();
         Task<Product> GetProductByIdAsync(int id);
         Task<IEnumerable<Product>> GetProductByCategoryId(int id);
         Task<bool> AddProductAsync(Product product); 
