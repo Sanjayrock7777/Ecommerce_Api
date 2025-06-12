@@ -21,12 +21,12 @@ namespace Ecommerce.Repositories.Repository
         }
         public async Task<int> CustomerCount()
         {
-            return   _context.Customers.Count();
+            return  _context.Customers.Count();
         }
         public async Task<(int pendingCount, int ShipingCount, int DeliveredCount)> OrdersCount()
         {
             var pending =  _context.Orders.Where(o => o.Status == "Pending").Count();
-            var shipping = _context.Orders.Where(o => o.Status == "Shipping").Count();
+            var shipping = _context.Orders.Where(o => o.Status == "Shipped").Count();
             var delivered = _context.Orders.Where(o => o.Status == "Delivered").Count();
             return (pending, shipping, delivered);
         }
@@ -38,6 +38,5 @@ namespace Ecommerce.Repositories.Repository
             TotalRevenue = g.Sum(o => o.TotalPrice) 
             }).OrderByDescending(o => o.OrderDate).ToList();
         }
-
     }
 }

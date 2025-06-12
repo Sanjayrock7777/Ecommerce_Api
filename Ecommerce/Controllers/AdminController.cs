@@ -15,7 +15,7 @@ namespace Ecommerce.Controllers
             _detailrepository = detailrepository;
         }
 
-        [Authorize(Roles ="Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpGet("GetAllEcommerceDetails")]
         public async Task<IActionResult> GetAllEcommerceDetails()
         {

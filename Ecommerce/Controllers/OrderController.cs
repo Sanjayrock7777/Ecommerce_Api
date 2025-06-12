@@ -17,7 +17,6 @@ namespace Ecommerce.Controllers
             _orderService = orderService;
         }
 
-        [Authorize(Roles = "Customer")]
         [HttpPost("createorder")]
         public async Task<IActionResult> CreateOrder([FromBody] Orderdto dto)
         {
@@ -38,7 +37,6 @@ namespace Ecommerce.Controllers
             }
         }
 
-        [Authorize(Roles = "Customer")]
         [HttpGet("userorders")]
         public async Task<IActionResult> GetUserOrders()
         {

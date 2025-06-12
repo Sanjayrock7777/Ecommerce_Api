@@ -60,13 +60,14 @@ namespace Ecom.Controllers
             var success = await _userService.UpdateCustomerAsync(userid, update);
             return Ok( new {Message = "Customer details updated Successfully" });
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(Logindto model)
         {
             var (success, role, userId, token) = await _userService.LoginAsync(model);
             return success ? Ok(new { success, role, userId, token }) : Unauthorized("Invalid credentials");
         }
-        [Authorize(Roles ="Customer")] 
+        //[Authorize(Roles ="Customer")] 
         [HttpGet("address")]
         public async Task<IActionResult> GetAddressByUserId()
         {
@@ -89,7 +90,5 @@ namespace Ecom.Controllers
                 mobile = user.PhoneNumber
             });
         }
-
-
     }
 }

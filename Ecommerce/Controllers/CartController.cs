@@ -20,7 +20,6 @@ namespace Ecommerce.Controllers
             _userManager = userManager;
         }
 
-        [Authorize(Roles ="Customer")]
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart([FromBody] Cartdto dto)
         {
@@ -31,7 +30,6 @@ namespace Ecommerce.Controllers
             return success ? Ok(new { success = true, message = "Item added to cart successfully" }) : BadRequest("Failed to add item.");
         }
 
-        [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<IActionResult> GetCart()
         {
@@ -41,7 +39,7 @@ namespace Ecommerce.Controllers
             var cart = await _cartService.GetCartAsync(userId);
             return cart != null ? Ok(cart) : NotFound("Cart not found.");
         }
-        [Authorize(Roles = "Customer")]
+
         [HttpPut("{cartItemId}/quantity")] 
         public async Task<IActionResult> UpdateCartItemQuantity(int cartItemId, int quantity)
         {
@@ -53,7 +51,6 @@ namespace Ecommerce.Controllers
             return Ok(new { success = true, message = "Quantity updated successfully!", cartItemId, quantity });
         }
 
-        [Authorize(Roles = "Customer")]
         [HttpDelete("{cartItemId}")]
         public async Task<IActionResult> DeleteCartItem(int cartItemId)
         {
