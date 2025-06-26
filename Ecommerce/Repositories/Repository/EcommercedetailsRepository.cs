@@ -1,6 +1,5 @@
 ﻿using Ecommerce.Data;
 using Ecommerce.Repositories.Interface;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Repositories.Repository
 {
@@ -26,7 +25,7 @@ namespace Ecommerce.Repositories.Repository
         public async Task<(int pendingCount, int ShipingCount, int DeliveredCount)> OrdersCount()
         {
             var pending =  _context.Orders.Where(o => o.Status == "Pending").Count();
-            var shipping = _context.Orders.Where(o => o.Status == "Shipping").Count();
+            var shipping = _context.Orders.Where(o => o.Status == "Shipped").Count();
             var delivered = _context.Orders.Where(o => o.Status == "Delivered").Count();
             return (pending, shipping, delivered);
         }

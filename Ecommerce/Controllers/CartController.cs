@@ -20,7 +20,7 @@ namespace Ecommerce.Controllers
             _userManager = userManager;
         }
 
-        [Authorize(Roles ="Customer")]
+        [Authorize(Roles = "Customer,Admin")]
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart([FromBody] Cartdto dto)
         {
@@ -53,7 +53,7 @@ namespace Ecommerce.Controllers
             return Ok(new { success = true, message = "Quantity updated successfully!", cartItemId, quantity });
         }
 
-        [Authorize(Roles = "Customer")]
+        //[Authorize(Roles = "Customer")]
         [HttpDelete("{cartItemId}")]
         public async Task<IActionResult> DeleteCartItem(int cartItemId)
         {

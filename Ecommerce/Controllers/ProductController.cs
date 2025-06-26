@@ -1,5 +1,4 @@
-﻿using Ecommerce.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Models;
 using Ecommerce.Dto;
 using Ecommerce.Services.Interface;
@@ -71,8 +70,7 @@ namespace Ecommerce.Controllers
         [HttpGet("search")]
         public async Task<IActionResult> SearchProducts(string query)
         {
-            if (string.IsNullOrWhiteSpace(query))
-                return BadRequest("Query cannot be empty");
+            if (query == "") return BadRequest("Query cannot be empty");
 
             var products = await _productService.SearchProductsAsync(query);
             if (products.Count != 0)

@@ -1,7 +1,4 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ecommerce.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Models;
 using Ecommerce.Dto;
 using Ecommerce.Services.Interface;

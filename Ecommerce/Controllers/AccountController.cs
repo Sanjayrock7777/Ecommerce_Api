@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Ecommerce.Services.Interface;
-using System.Linq.Expressions;
 
 namespace Ecom.Controllers
 {
@@ -34,7 +33,7 @@ namespace Ecom.Controllers
                 return StatusCode(500,new {success = false,Message=ex.Message});    
             }
         }
-        [Authorize(Roles ="Admin")]
+        //[Authorize(Roles = "Admin")]
         [HttpPost("register/Admin")]
         public async Task<IActionResult> RegisterAdmin(Registerdto model)
         {
@@ -52,7 +51,7 @@ namespace Ecom.Controllers
                 return StatusCode(500, new { success = false, Message = ex.Message });
             }
         }
-        [Authorize]
+        [Authorize(Roles = "Customer")]
         [HttpPut("update/customer")]
         public async Task<IActionResult> UpdateCustomer(Registerdto update)
         {
@@ -66,7 +65,7 @@ namespace Ecom.Controllers
             var (success, role, userId, token) = await _userService.LoginAsync(model);
             return success ? Ok(new { success, role, userId, token }) : Unauthorized("Invalid credentials");
         }
-        [Authorize(Roles ="Customer")] 
+        [Authorize] 
         [HttpGet("address")]
         public async Task<IActionResult> GetAddressByUserId()
         {

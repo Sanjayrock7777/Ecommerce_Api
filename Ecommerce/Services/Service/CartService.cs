@@ -63,7 +63,7 @@ namespace Ecommerce.Services.Service
             var cartItem = await _cartRepository.GetCartItemByIdAsync(cartItemId);
             
             if (cartItem == null) return false;
-            if(0< quantity && quantity< cartItem.Product.stock)
+            if(0 < quantity && quantity<= cartItem.Product.stock)
             {
                 cartItem.Quantity = quantity;
                 await _cartRepository.SaveChangesAsync();

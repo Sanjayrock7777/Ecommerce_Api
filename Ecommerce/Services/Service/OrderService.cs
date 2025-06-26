@@ -51,7 +51,8 @@ namespace Ecommerce.Services.Service
                 foreach (var item in order.OrderItems)
                 {
                     var product = products.FirstOrDefault(p => p.Id == item.ProductId);
-                    if (product != null) product.stock -= item.Quantity;
+                    if (product != null && product.stock > 0) product.stock -= item.Quantity;
+                    else return null;
                 }
                 await _orderRepository.CreateOrderAsync(order);
                 await _orderRepository.SaveChangesAsync();
