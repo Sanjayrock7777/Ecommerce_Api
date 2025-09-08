@@ -22,6 +22,26 @@ namespace Ecommerce.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Ecommerce.Models.Admin", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Admin");
+                });
+
             modelBuilder.Entity("Ecommerce.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -162,6 +182,9 @@ namespace Ecommerce.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -189,29 +212,6 @@ namespace Ecommerce.Migrations
                         .IsUnique();
 
                     b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("Ecommerce.Models.Employee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Order", b =>
@@ -284,35 +284,6 @@ namespace Ecommerce.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("Ecommerce.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payments");
-                });
-
             modelBuilder.Entity("Ecommerce.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -321,11 +292,18 @@ namespace Ecommerce.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Brand")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -478,6 +456,17 @@ namespace Ecommerce.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Ecommerce.Models.Admin", b =>
+                {
+                    b.HasOne("Ecommerce.Models.ApplicationUser", "User")
+                        .WithOne("Admin")
+                        .HasForeignKey("Ecommerce.Models.Admin", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Ecommerce.Models.Cart", b =>
                 {
                     b.HasOne("Ecommerce.Models.ApplicationUser", "User")
@@ -519,17 +508,6 @@ namespace Ecommerce.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Ecommerce.Models.Employee", b =>
-                {
-                    b.HasOne("Ecommerce.Models.ApplicationUser", "User")
-                        .WithOne("Employee")
-                        .HasForeignKey("Ecommerce.Models.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Ecommerce.Models.Order", b =>
                 {
                     b.HasOne("Ecommerce.Models.ApplicationUser", "User")
@@ -558,17 +536,6 @@ namespace Ecommerce.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("Ecommerce.Models.Payment", b =>
-                {
-                    b.HasOne("Ecommerce.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ecommerce.Models.Product", b =>
@@ -635,10 +602,10 @@ namespace Ecommerce.Migrations
 
             modelBuilder.Entity("Ecommerce.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("Customer")
+                    b.Navigation("Admin")
                         .IsRequired();
 
-                    b.Navigation("Employee")
+                    b.Navigation("Customer")
                         .IsRequired();
                 });
 

@@ -1,119 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Ecommerce.Data;
-using Ecommerce.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Dto;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using Ecommerce.Services.Interface;
+using Ecommerce.Models;
 namespace Ecommerce.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class OrderController : ControllerBase
     {
-        private readonly EcomDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        public OrderController(EcomDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IOrderService _orderService;
+
+        public OrderController(IOrderService orderService)
         {
-            _context = context;
-            _userManager = userManager;
+            _orderService = orderService;
         }
-        [Authorize]
+
+        [Authorize(Roles = "Customer")]
         [HttpPost("createorder")]
         public async Task<IActionResult> CreateOrder([FromBody] Orderdto dto)
         {
-            if (dto == null)
-            {
-                return BadRequest(new { success = false, message = "Invalid order data" });
-            }
+            if (dto == null) return BadRequest(new { success = false, message = "Invalid order data" });
+
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
+            if (userId == null) return Unauthorized(new { success = false, message = "Invalid Token" });
+
+            try
             {
-                return NotFound(new { success = false, message = "User not found" });
+                var order = await _orderService.CreateOrderAsync(userId, dto);
+                if (order == null) return NotFound();
+                return Ok(new { success = true, message = "Order placed successfully!", orderId = order.Id });
             }
-
-            var cart = await _context.Carts.FirstOrDefaultAsync(c => c.UserId == userId);
-            if (cart == null)
+            catch (Exception ex)
             {
-                return BadRequest(new { success = false, message = "Cart not found for user." });
+                return BadRequest(new { success = false, message = ex.Message });
             }
-            var order = new Order
-            {
-                UserId = userId,
-                Address = dto.Address,
-                Pincode = dto.Pincode,
-                TotalPrice = dto.TotalPrice,
-                PaymentMethod = dto.PaymentMethod,
-                OrderDate = DateTime.Now,
-                Status = "Pending",
-                OrderItems = dto.Orderitems.Select(oi => new OrderItem
-                {
-                    ProductId = oi.ProductId,
-                    Quantity = oi.Quantity,
-                    Price = oi.Price
-                }).ToList()
-            };
-
-            _context.Orders.Add(order);
-            foreach (var item in order.OrderItems)
-            {
-                var product = await _context.Products.FindAsync(item.ProductId);
-                if (product != null)
-                {
-                    product.stock -= item.Quantity;
-                }
-            }
-
-            var cartItems = _context.CartItems.Where(c => c.CartId == cart.Id).ToList();
-
-            
-            var cartItemsToRemove = cartItems.Where(c => dto.Orderitems.Any(o => o.ProductId == c.ProductId)).ToList();
-
-            if (cartItemsToRemove.Any())
-            {
-                _context.CartItems.RemoveRange(cartItemsToRemove);
-            }
-
-            await _context.SaveChangesAsync();
-
-
-            return Ok(new { success = true, message = "Order placed successfully!", orderId = order.Id });
         }
+
+        [Authorize(Roles = "Customer")]
         [HttpGet("userorders")]
-        public async Task<IActionResult> GetuserOrder()
+        public async Task<IActionResult> GetUserOrders()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized(new { success = false, message = "Invalid Token" });
-            }
-            var orders = await _context.Orders.Where(o => o.UserId == userId).Include(o =>o.OrderItems).OrderByDescending(o=> o.OrderDate).Select(
-                o=> new
-                {
-                    o.OrderDate,
-                    o.PaymentMethod,
-                    o.Status,
-                    o.Address,
-                    OrderItems = o.OrderItems.Select(oi => new
-                    {
-                        ProductName = oi.Product.Name,
-                        oi.Quantity,
-                        oi.Price
-                    }).ToList()
-                }).ToListAsync();
-            if (orders == null) 
-            {
-                return NotFound(new { success = false, message = "No orders found for the user." });
-            }
-            return Ok(new { success = true, orders });
+            if (string.IsNullOrEmpty(userId)) return Unauthorized(new { success = false, message = "Invalid Token" });
+            var orders = await _orderService.GetUserOrdersAsync(userId);
+            return orders != null? Ok(new { success = true, orders }): NotFound(new { success = false, message = "No orders found for the user." });
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPatch("UpdateOrderStatus/{id}")]
+        public async Task<IActionResult> UpdateOrderStatus(int id, string orderStatus)
+        {
+            var orderstatusupdate = await _orderService.UpdateOrderStatusAsync(id, orderStatus);
+            return orderstatusupdate != null ? Ok(new { success = true, Message = "Order Status Updated Successfully" }) : NotFound(new { success = false });
+        }
+
+       [Authorize(Roles = "Admin")]
+        [HttpGet("GetAllOrders")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetAllOrders()
+        {
+            var order = await _orderService.GetAllOrdersAsync();
+            if (order == null) 
+                return NotFound(new { Message = "Orders not found" });
+            return Ok(order);   
+        }
     }
 }

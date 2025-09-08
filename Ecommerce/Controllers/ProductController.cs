@@ -1,10 +1,7 @@
-﻿using Ecommerce.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Ecommerce.Models;
 using Ecommerce.Dto;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Ecommerce.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 namespace Ecommerce.Controllers
 {
@@ -12,72 +9,78 @@ namespace Ecommerce.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly EcomDbContext context;
-        public ProductController(EcomDbContext _context)
+        private readonly IProductService _productService;
+        public ProductController(IProductService productService)
         {
-            context = _context;
+            _productService = productService;
         }
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> Getallproduct()
+        [HttpGet("GetAllProductsforcustomer")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetallproductforCustomer()
         {
-            return await context.Products.ToListAsync();
+            var product = await _productService.GetProductAsync();
+            return Ok(product);
+        }
+        [HttpGet("GetAllProductsforAdmin")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetallproductforAdmin()
+        {
+            var product = await _productService.GetProductforAdminAsync();
+            return Ok(product);
+        }
 
-        }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Product>>> Getproductbyid(int id)
+        [HttpGet("GetProductByProductId/{id}")]
+        public async Task<ActionResult<Product>> GetProductById(int id)
         {
-            return await context.Products.Where(p => p.CategoryId == id).ToListAsync(); 
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null) 
+                return NotFound(new { Message = "Product not found" });
+
+            return Ok(product);
         }
+        [HttpGet("GetProductByCategoryId/{id}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetproductbyCategoryid(int id)
+        {
+            var productByCategoryId = await _productService.GetProductsByCategoryIdAsync(id);   
+            return Ok(productByCategoryId); 
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> Updateproduct(int id, Product products)
+        public async Task<ActionResult<Product>> Updateproduct(int id, Productdto product)
         {
-             if(id != products.Id)
-            {
-                return BadRequest();
-            }
-             context.Entry(products).State = EntityState.Modified;
-            try
-            {
-                await context.Products.AddAsync(products);
-            }
-            catch(DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-            return NoContent();
+            var result = await _productService.UpdateProductAsync(id,product);
+            return result!=null ? Ok(new {Message="Updated Successfully"}) : BadRequest("Failed to Delete");  
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<Product>> Addproduct(Productdto dto)
         {
-            var category = await context.Categories.FindAsync(dto.CategoryId);
-            if(category == null)
-            {
-                return BadRequest("Invalid Category Id");
-            }
-            var product = new Product
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                Price = dto.Price,
-                stock = dto.stock,
-                CategoryId = dto.CategoryId,
-            };
-             context.Products.Add(product);
-             await context.SaveChangesAsync();
-            return Ok(product);
-            
+            var result = await _productService.AddProductAsync(dto);
+            return result != null ? Ok(new { Message = "Category Added" }) : BadRequest("Failed to Category");
+
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Deleteproduct(int id)
         {
-            var products = await context.Products.FindAsync(id);
-            if(products == null)
+            var result = await _productService.DeleteProductAsync(id);
+            return result != null ? Ok(new {Message = "Deleted Successfully"}):BadRequest("Failed to Category");
+        }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string query)
+        {
+            if (query == "") return BadRequest("Query cannot be empty");
+
+            var products = await _productService.SearchProductsAsync(query);
+            if (products.Count != 0)
             {
-                return NotFound();
+                return Ok(products);
             }
-            context.Products.Remove(products);
-            await context.SaveChangesAsync();
-            return NoContent();
+            else
+            {
+                return Ok(new { productfoundstatus = false });
+            }
         }
 
     }

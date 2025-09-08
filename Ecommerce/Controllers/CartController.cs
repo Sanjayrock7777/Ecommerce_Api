@@ -2,131 +2,69 @@
 using Ecommerce.Dto;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Ecommerce.Data;
 using Microsoft.AspNetCore.Authorization;
-using System;
+using Ecommerce.Services.Interface;
 namespace Ecommerce.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class CartController : ControllerBase
     {
-        private readonly EcomDbContext _context;
+        private readonly ICartService _cartService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public CartController(EcomDbContext context, UserManager<ApplicationUser> userManager)
+
+        public CartController(ICartService cartService, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _cartService = cartService;
             _userManager = userManager;
         }
 
-        [Authorize] 
+        [Authorize(Roles = "Customer,Admin")]
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart([FromBody] Cartdto dto)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; //  Correct extraction
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized("Invalid Token");
 
-
-            if (userId == null)
-                return Unauthorized("Invalid Token");
-
-            var cart = await _context.Carts.Include(c => c.CartItem).FirstOrDefaultAsync(c => c.UserId == userId);
-
-            if (cart == null)
-            {
-                cart = new Cart
-                {
-                    UserId = userId, 
-                    CartItem = new List<CartItem>
-            {
-                new CartItem
-                {
-                    ProductId = dto.ProductId,
-                    Quantity = dto.Quantity
-                }
-            }
-                };
-
-                _context.Carts.Add(cart);
-            }
-            else
-            {
-                var existingItem = cart.CartItem.FirstOrDefault(ci => ci.ProductId == dto.ProductId);
-                if (existingItem != null)
-                {
-                    existingItem.Quantity += dto.Quantity;
-                }
-                else
-                {
-                    cart.CartItem.Add(new CartItem
-                    {
-                        ProductId = dto.ProductId,
-                        Quantity = dto.Quantity
-                    });
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return Ok(new { success = true, message = "Item added to cart successfully!" });
+            var success = await _cartService.AddToCartAsync(userId, dto);
+            return success ? Ok(new { success = true, message = "Item added to cart successfully" }) : BadRequest("Failed to add item.");
         }
-        [Authorize]
+
+        [Authorize(Roles = "Customer")]
         [HttpGet]
         public async Task<IActionResult> GetCart()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value; 
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized("Invalid Token");
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized(new { success = false, message = "Invalid Token" });
-
-            var cart = await _context.Carts.Include(c => c.CartItem)
-                                           .ThenInclude(ci => ci.Product)
-                                           .FirstOrDefaultAsync(c => c.UserId == userId);
-
-            if (cart == null)
-                return NotFound("Cart not found.");
-
-            return Ok(cart.CartItem.Select(ci => new
-            {
-                ci.Id,
-                ci.ProductId,
-                ci.Product.Name,
-                ci.Quantity,
-                ci.Product.Price,
-                Total = ci.Product.Price * ci.Quantity
-            }));
+            var cart = await _cartService.GetCartAsync(userId);
+            return cart != null ? Ok(cart) : NotFound("Cart not found.");
         }
-
-        [HttpPut("{cartItemId}/quantity")]
-        public async Task<IActionResult> UpdateCartItem(int cartItemId, int quantity)
+        [Authorize(Roles = "Customer")]
+        [HttpPut("{cartItemId}/quantity")] 
+        public async Task<IActionResult> UpdateCartItemQuantity(int cartItemId, int quantity)
         {
-            var cartitem = await _context.CartItems.FindAsync(cartItemId);
-            if (cartitem == null)
+            var success = await _cartService.UpdateCartItemQuantityAsync(cartItemId, quantity);
+            if (!success)
             {
-                return NotFound(new { success = false, message = "CartItem not found" });
+                return NotFound(new { success = false, message = "Cart item not found" });
             }
-            cartitem.Quantity = quantity;
-            await _context.SaveChangesAsync();
-
-            return Ok(new { success = true, message = "Quantity updated successfully!", cartitem });
+            return Ok(new { success = true, message = "Quantity updated successfully!", cartItemId, quantity });
         }
+
+        //[Authorize(Roles = "Customer")]
         [HttpDelete("{cartItemId}")]
-        public async Task<IActionResult> DeletecartItem(int cartItemId)
+        public async Task<IActionResult> DeleteCartItem(int cartItemId)
         {
-            var cartitem = await _context.CartItems.FindAsync(cartItemId);
-            if (cartitem == null)
+            var success = await _cartService.DeleteCartItemAsync(cartItemId);
+            if (!success)
             {
-                return NotFound(new { success = false, message = "CartItem not found" });
+                return NotFound(new { success = false, message = "Cart item not found" });
             }
-            _context.CartItems.Remove(cartitem);
-            await _context.SaveChangesAsync();
-            return Ok(new { success = true, message = "Cartitem Deleted successfully!", cartitem });
+
+            return Ok(new { success = true, message = "Item removed from cart successfully" });
         }
-
-
     }
 
 }

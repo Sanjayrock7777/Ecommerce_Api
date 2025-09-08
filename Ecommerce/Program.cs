@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +6,11 @@ using Microsoft.OpenApi.Models;
 using Ecommerce.Data;
 using Ecommerce.Models;
 using Ecommerce.Repos;
+using Ecommerce.Repositories.Interface;
+using Ecommerce.Repositories.Repository;
+using Ecommerce.Services.Interface;
+using Ecommerce.Services.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Configure database connection
@@ -17,13 +21,32 @@ builder.Services.AddDbContext<EcomDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<EcomDbContext>()
     .AddDefaultTokenProviders();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
 });
 
 builder.Services.AddScoped<JwttokenService>();
-// Configure Authentication using JWT
+
+builder.Services.AddScoped<IEcommercedetailsRepository, EcommercedetailsRepository>();
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+
+builder.Services.AddScoped<ICartRepository, CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+
+// Configure authentication using JWT
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = "Bearer";
@@ -43,7 +66,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
 });
-
 // Add controllers
 builder.Services.AddControllers();
 
@@ -55,10 +77,9 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Ecommerce API",
         Version = "v1",
-        Description = "An API for managing Ecommerce system with Customer, Employee, and Admin roles."
+        Description = "Ecommerce system with Customer and Admin roles"
     });
 
-    // Configure JWT Authentication in Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,
@@ -92,7 +113,6 @@ builder.Services.AddCors(options =>
                         .AllowCredentials());
 });
 
-// Build and run the app
 var app = builder.Build();
 app.UseCors("AllowFrontend");
 if (app.Environment.IsDevelopment())
@@ -100,7 +120,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
